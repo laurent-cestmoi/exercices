@@ -314,5 +314,36 @@ On va faire deux configuration de nodemon ;
 
 #### Récupérer les infos de la base de données
 
-C'est ici qu'intervient `objection.js`
-A suivre...
+On va faire à présent référence à notre configuration pour utiliser knex dans notre code dédié à être déployé. On va faire "à la mode Camino" :
+1. Créer un répertoire `config` dans le répertoire `src`
+2. Créer dans ce répertoire le fichier `knex.ts` et y insérer le code suivant :
+    ```javascript
+    const connection = {
+        host: process.env.PGHOST,
+        port: Number(process.env.PGPORT),
+        database: process.env.PGDATABASE,
+        user: process.env.PGUSER,
+        password: process.env.PGPASSWORD
+    };
+
+    const knexConfig = {
+        client: 'pg',
+        connection  
+    };
+
+    export { knexConfig };
+    ```
+3. Modifier le fichier `server.ts` pour ajouter les lignes nécessaires à lister dans le terminal le contenu de la table issues.
+    ```javascript
+    import { knex } from 'knex';
+    import * as knexfile from './config/knex';
+
+    const db = knex(knexfile.knexConfig);
+
+    db('issues').then(function (rows) {
+    for (var r of rows) {
+        //console.log('Issue:', r.nom);
+        console.log(`${r.id} ${r.nom} ${r.url}`);
+    }
+});
+    ```
