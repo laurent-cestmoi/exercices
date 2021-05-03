@@ -1,9 +1,16 @@
-# exercices
+# Série d'exercices <!-- omit in toc -->
 Exercices pour montée en compétence sur Node.js, TypeScript, Knex.js, etc.
 
-## Exercice 1
+- [Exercice 1](#exercice-1)
+  - [Mise en place de l'environnement développement et du projet](#mise-en-place-de-lenvironnement-développement-et-du-projet)
+  - [Interaction avec une base de données PostgreSQL](#interaction-avec-une-base-de-données-postgresql)
+    - [Création de la structure de la base de données](#création-de-la-structure-de-la-base-de-données)
+    - [Alimentation de la base de données](#alimentation-de-la-base-de-données)
+    - [Récupérer les infos de la base de données](#récupérer-les-infos-de-la-base-de-données)
 
-### Mise en place de l'environnement développement et du projet
+# Exercice 1
+
+## Mise en place de l'environnement développement et du projet
 
 * Création d'une branche "exercice1"
 * Se placer sur cette branche
@@ -33,13 +40,11 @@ Exercices pour montée en compétence sur Node.js, TypeScript, Knex.js, etc.
     `message TS6071: Successfully created a tsconfig.json file.`
     *Remarque : Le fichier `tsconfig.json` a été créé à la racine du projet.*
 * Indiquer dans le fichier `tsconfig.json` d'inclure les fichiers se trouvant dans le répertoire `src` en ajoutant ceci après la propriété compilerOptions :
-    ```
-    ",
+    ```json
     "include": ["src/"]
-    "
     ```
 * Modifier aussi le target pour produire du ES2017 (remplacer es5):
-    ```
+    ```json
     "target": "ES2017"
     ```
 * Créer un répertoire dist à la racine du projet pour accueillir les fichiers destinés à la prod.
@@ -115,10 +120,10 @@ On va faire deux configuration de nodemon ;
 * La bibliothèque express n’inclut aucun fichier de définition pour TypeScript. Installer la définition avec la commande suivante :
     `npm install @types/express --save-dev`
 
-### Interaction avec une base de données PostgreSQL
+## Interaction avec une base de données PostgreSQL
 
 * Créer une base de données PostgreSQL et renseigner  les paramètres nécessaires dans le fichier `.env`
-    ```
+    ```sh
     PGHOST=localhost # Hôte sur lequel se trouve le cluster PostgreSQL
     PGPORT=5413 # Numéro de port d'accès au cluster PostgreSQL (5432 par défaut)
     PGDATABASE=exercices # Nom de votre BDD PostgreSQL
@@ -127,7 +132,7 @@ On va faire deux configuration de nodemon ;
     ```
 * Installer Knex et le client PostgreSQL :
     `npm install knex pg`
-* Créer un répertoire `knex` pour accueillir les fichiers à utiliser.4
+* Créer un répertoire `knex` pour accueillir les fichiers à utiliser.
     * créer le sous-répertoire `migrations` pour accueillir les fichiers de création de la base de données.
     * créer le sous-répertoire `seeds` pour accueillir les fichiers d'alimentation de la base de données.
 * Se positionner dans le répertoire `knex`
@@ -165,7 +170,7 @@ On va faire deux configuration de nodemon ;
         module.exports = knexConfig;
         ```
         > **_NOTE :_**  C'est ce fichier `cli-config.js` qui sera "notre `knexfile.js` classique".
-#### Création de la structure de la base de données   
+### Création de la structure de la base de données   
 
 * Créer le répertoire `migrations` dans le dossier `knex`.
 * Générer le fichier .js qui contiendra la définition de notre table `issues` :
@@ -219,7 +224,7 @@ On va faire deux configuration de nodemon ;
 * lancer la commande de migration pour vérifier que tout est à jour :
     `npm run db:migrate`
 
-#### Alimentation de la base de données   
+### Alimentation de la base de données   
 
 * Créer le répertoire `seeds` dans le dossier `knex`.
 * Générer le fichier .js qui contiendra des insertions de données dans la table `issues` :
@@ -296,7 +301,6 @@ On va faire deux configuration de nodemon ;
 
         return func({ del, insert })
         };
-
         ```
     4. ajouter le script de création de la structure de la base de données au fichier `package.json` :
         `"db:seed": "npx knex seed:run --knexfile .\\knex\\cli-config.js"`
@@ -312,7 +316,7 @@ On va faire deux configuration de nodemon ;
         Ran 1 seed files
         ```
 
-#### Récupérer les infos de la base de données
+### Récupérer les infos de la base de données
 
 On va faire à présent référence à notre configuration pour utiliser knex dans notre code dédié à être déployé. On va faire "à la mode Camino" :
 1. Créer un répertoire `config` dans le répertoire `src`
@@ -334,16 +338,41 @@ On va faire à présent référence à notre configuration pour utiliser knex da
     export { knexConfig };
     ```
 3. Modifier le fichier `server.ts` pour ajouter les lignes nécessaires à lister dans le terminal le contenu de la table issues.
+    > **Remarque :** On utilisera un appel asynchrone pour gérer l'ordre d'affichage dans le log de la console.
     ```javascript
-    import { knex } from 'knex';
-    import * as knexfile from './config/knex';
+    // Récupération de issues (en fait le select * from issues)
+    function getIssues() {
+    // Plusieurs façons d'écrire le select * from issues :
+    // db('issues')
+    // db.from('issues').select('*')
+    return db('issues');
+    };
 
-    const db = knex(knexfile.knexConfig);
+    // Utilisation d'une fonction asynchrone pour avoir tous les 
+    // retours console dans l'ordre souhaité
+    (async function(){
+    const res = await getIssues()
+    .then(data => {
 
-    db('issues').then(function (rows) {
-    for (var r of rows) {
-        //console.log('Issue:', r.nom);
-        console.log(`${r.id} ${r.nom} ${r.url}`);
-    }
-});
+        // On affiche la requête créée par knex
+        console.log('Requête créée par knex :');
+        console.log(getIssues().toString(), '\n');
+
+        // On affiche le résultat brut
+        console.log('Résultat brut :') 
+        console.log(data,'\n');
+
+        // On affiche plus joliment en ne prenant que les attributs
+        console.log('Résultat avec simplement la valeur des attributs id, nom, url :')
+        for (const issue of data) {
+        console.log(issue.id, issue.nom, issue.url);
+        }
+    })
+    .catch(err => {
+        console.log(err.message);
+    })
+    .finally(() => {
+        db.destroy();
+    });
+    })();
     ```
