@@ -9,6 +9,9 @@ Exercices pour montée en compétence sur Node.js, TypeScript, Knex.js, etc.
     - [Création de la structure de la base de données](#création-de-la-structure-de-la-base-de-données)
     - [Alimentation de la base de données](#alimentation-de-la-base-de-données)
     - [Récupérer les infos de la base de données](#récupérer-les-infos-de-la-base-de-données)
+- [Exercice 2](#exercice-2)
+  - [Énoncé de l'exercice](#énoncé-de-lexercice-1)
+  - [Mise en place du serveur http](#mise-en-place-du-serveur-http)
 
 # Exercice 1
 
@@ -390,3 +393,28 @@ On va faire à présent référence à notre configuration pour utiliser knex da
     });
     })();
     ```
+# Exercice 2
+
+Amélioration des requêtes et mise en place des tests.
+
+## Énoncé de l'exercice
+
+Le but de cet exercice est de pouvoir créer des requêtes en base de données pour pouvoir faire des selections plus fines en base de données.
+Nous souhaitons :
+* pouvoir récupérer une issue en particulier grâce à son id
+* Récupérer toutes les issues qui ont été modifiées depuis une certaine date
+
+A faire:
+* Créer une nouvelle migration knex, pour ajouter des timestamps (updated_at et created_at) (Ne pas hésiter à utiliser les mécanismes typestamp fournis par knex)
+* Créer deux nouvelles méthodes qui permettent d'implémenter les deux requêtes
+* Mettre en place des tests Jest pour tester ces deux méthodes.
+
+>**Note sur les tests :**
+    Au lancement des tests, on initialisera la table issues avec des données de tests.
+    On pourra tester le nombre de résultats renvoyés par chacune des méthode.
+    Tester 2 use cases :
+    1. le cas ou aucune donnée ne correspond à la recherche
+    2. le cas ou une partie des données correspondent à la recherche
+
+## Mise en place du serveur http
+
