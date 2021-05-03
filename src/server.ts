@@ -13,7 +13,8 @@ const db = knex(knexfile.knexConfig);
 function getIssues() {
   // Plusieurs façons d'écrire le select * from issues :
   // db('issues')
-  // db.from('issues').select('*')
+  // db.select().table('issues')
+  // db.select('*').table('issues')
   return db('issues');
 };
 
