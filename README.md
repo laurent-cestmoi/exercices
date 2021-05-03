@@ -1,7 +1,9 @@
 # Série d'exercices <!-- omit in toc -->
 Exercices pour montée en compétence sur Node.js, TypeScript, Knex.js, etc.
+>Remarque : Je debute en programmation. Une certaine indulgence est requise :innocent:
 
 - [Exercice 1](#exercice-1)
+  - [Énoncé de l'exercice](#énoncé-de-lexercice)
   - [Mise en place de l'environnement développement et du projet](#mise-en-place-de-lenvironnement-développement-et-du-projet)
   - [Interaction avec une base de données PostgreSQL](#interaction-avec-une-base-de-données-postgresql)
     - [Création de la structure de la base de données](#création-de-la-structure-de-la-base-de-données)
@@ -10,6 +12,18 @@ Exercices pour montée en compétence sur Node.js, TypeScript, Knex.js, etc.
 
 # Exercice 1
 
+## Énoncé de l'exercice
+
+* À faire :
+  * Modéliser et scripter les issues en BDD (une seule table avec pour champ : Id, nom, URL Github)
+  * Réaliser un script d'import qui permet d'ajouter rapidement des données de tests dans cette base de données)
+  * En lançant l'outil, les issues sont listées en ligne de commande
+
+* À utiliser:
+
+    * Créer un repo Github spécifique pour cet exercice la lib Knex.js (pour la création script de création de la base de données (Migration), import de données, et requêtes SQL de lecture.)
+
+> Pour le reste, aucune consigne => Libre choix
 ## Mise en place de l'environnement développement et du projet
 
 * Création d'une branche "exercice1"
