@@ -11,7 +11,7 @@ Exercices pour montée en compétence sur Node.js, TypeScript, Knex.js, etc.
     - [Récupérer les infos de la base de données](#récupérer-les-infos-de-la-base-de-données)
 - [Exercice 2](#exercice-2)
   - [Énoncé de l'exercice](#énoncé-de-lexercice-1)
-  - [Mise en place du serveur http](#mise-en-place-du-serveur-http)
+  - [Créer un modèle avec les 2 fonctions](#créer-un-modèle-avec-les-2-fonctions)
 
 # Exercice 1
 
@@ -361,7 +361,8 @@ On va faire à présent référence à notre configuration pour utiliser knex da
     function getIssues() {
     // Plusieurs façons d'écrire le select * from issues :
     // db('issues')
-    // db.from('issues').select('*')
+    // db.select().table('issues')
+    // db.select('*').table('issues')
     return db('issues');
     };
 
@@ -416,5 +417,58 @@ A faire:
     1. le cas ou aucune donnée ne correspond à la recherche
     2. le cas ou une partie des données correspondent à la recherche
 
-## Mise en place du serveur http
+## Créer un modèle avec les 2 fonctions
+
+* Créer le répertoire `models` dans `src`
+* Créer le fichier `issue-models.ts`
+* Y ajouter les deux fonctions :
+  * Pour récupérer toutes les issues
+  * Pour récupérer une seule issue en précisant on id
+  ```typescript
+  import knex from '../config/knex';
+
+    const db = knex();
+
+    interface Issue {
+        id: number;
+        nom: string;
+        url: number;
+    };
+
+    export async function findAll(): Promise<Issue>{
+        const issues = await db('issues');
+        return issues;
+    };
+
+    export async function findById(id: number): Promise<Issue>{
+        const issue = await db('issues').where("id", id);
+        return issue;
+    };
+
+  ```
+* modifier le fichier `server.ts` pour appeler ces deux fonctions et voir le résultat dans la console :
+  ```typescript
+    import express from "express";
+    import { config } from "dotenv";
+
+    config(); 
+    
+    const app = express(); 
+    const port = process.env.PORT || 3000;
+
+    import {findAll, findById} from "./models/issue-model";
+
+    async function main(): Promise<any> {
+        console.log(await findAll());
+        console.log(await findById(1)); // retourne l'issue qui a son id = 1
+    }
+
+    main().catch(err => {
+        console.log(err.message);
+    });
+
+    main().finally(() => {
+        process.exit()
+    });
+  ```
 

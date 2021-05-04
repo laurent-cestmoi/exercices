@@ -1,5 +1,7 @@
 //import { knexSnakeCaseMappers } from 'objection'
 
+import knex from "knex";
+
 const connection = {
   host: process.env.PGHOST,
   port: Number(process.env.PGPORT),
@@ -15,4 +17,6 @@ const knexConfig = {
   //...knexSnakeCaseMappers()
 };
 
-export { knexConfig };
+//export { knexConfig };
+
+export default require('knex')(knexConfig);

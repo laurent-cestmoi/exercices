@@ -1,50 +1,30 @@
 import express from "express";
 import { config } from "dotenv";
-import { knex } from 'knex';
-import * as knexfile from './config/knex';
+//import { knex } from 'knex';
+//import * as knexfile from './config/knex';
+//import knex from './config/knex';
 
 config(); 
  
 const app = express(); 
 const port = process.env.PORT || 3000;
-const db = knex(knexfile.knexConfig);
+//const db = knex();
 
-// Récupération de issues (en fait le select * from issues)
-function getIssues() {
-  // Plusieurs façons d'écrire le select * from issues :
-  // db('issues')
-  // db.select().table('issues')
-  // db.select('*').table('issues')
-  return db('issues');
-};
+import {findAll, findById} from "./models/issue-model";
 
-// Utilisation d'une fonction asynchrone pour avoir tous les 
-// retours console dans l'ordre souhaité
-(async function(){
-  const res = await getIssues()
-  .then(data => {
+async function main(): Promise<any> {
+  console.log(await findAll());
+  console.log(await findById(1)); // retourne l'issue qui a son id = 1
+}
 
-    // On affiche la requête créée par knex
-    console.log('Requête créée par knex :');
-    console.log(getIssues().toString(), '\n');
+main().catch(err => {
+  console.log(err.message);
+});
 
-    // On affiche le résultat brut
-    console.log('Résultat brut :') 
-    console.log(data,'\n');
+main().finally(() => {
+  process.exit()
+});
 
-    // On affiche plus joliment en ne prenant que les attributs
-    console.log('Résultat avec simplement la valeur des attributs id, nom, url :')
-    for (const issue of data) {
-      console.log(issue.id, issue.nom, issue.url);
-    }
-  })
-  .catch(err => {
-    console.log(err.message);
-  })
-  .finally(() => {
-    db.destroy();
-  });
-})();
 
 /*
 //app.get("/", (req, res) => res.send("Début de l'exercice 1."));
