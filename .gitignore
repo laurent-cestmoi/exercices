@@ -51,11 +51,8 @@ typings/
 .nuxt
 dist
 
-
-
-
-
 # Personnalisation de Visual Studio Code
 .vscode/
-# Fichiers de prod
-dist/
+
+# Fichiers générés par les tests
+coverage/

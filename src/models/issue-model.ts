@@ -1,3 +1,4 @@
+import { config } from "dotenv";
 import knex from '../config/knex';
 
 //const db = knex();

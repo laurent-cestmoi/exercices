@@ -1,6 +1,6 @@
 //import { knexSnakeCaseMappers } from 'objection'
-
-import knex from "knex";
+import { config } from "dotenv";
+config(); 
 
 const connection = {
   host: process.env.PGHOST,
