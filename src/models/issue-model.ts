@@ -14,7 +14,7 @@ export async function findAll(): Promise<Array<Issue>>{
     return issues;
 };
 
-export async function findById(id: number): Promise<Issue>{
+export async function findById(id: number): Promise<Issue> {
     const issue = await  knex('issues').select().where("id", id);
     return issue;
 };

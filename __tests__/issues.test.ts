@@ -18,6 +18,12 @@ beforeAll(async () => {
     ]);
 });
 
+// Fermer la connexion à la base (notamment pour bien sortir des tests)
+afterAll(() => {
+    knex.destroy()
+});
+
+// On écrit le test sur la fonction devant renvoyer toutes les issues
 test('renvoie toutes les issues', async() => {
     // On exécute la fonction
     const data  = await findAll() ;
@@ -25,7 +31,16 @@ test('renvoie toutes les issues', async() => {
     expect(data.length).toEqual(2);
 });
 
-// On écrit le test sur la fonction devant renvoyer toutes les issues
+// On écrit le test sur la fonction devant renvoyer l'issues correspondant à l'id demandé
+test('renvoie l\'issue avec l\'id demandé', async() => {
+    // On exécute la fonction
+    const data  = await findById(1) ;
+    //console.log(data);
+    // On indique le résultat attendu
+    expect(data.id).toEqual(1);
+    // const value = 1 + 1;
+    // expect(value).toEqual(2);
+});
 
 
 
