@@ -35,7 +35,7 @@ test('renvoie toutes les issues', async() => {
 test('renvoie l\'issue avec l\'id demandé', async() => {
     // On exécute la fonction
     const data  = await findById(1) ;
-    //console.log(data);
+    console.log(data);
     // On indique le résultat attendu
     expect(data.id).toEqual(1);
     // const value = 1 + 1;
