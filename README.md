@@ -12,6 +12,8 @@ Exercices pour montée en compétence sur Node.js, TypeScript, Knex.js, etc.
 - [Exercice 2](#exercice-2)
   - [Énoncé de l'exercice](#énoncé-de-lexercice-1)
   - [Créer un modèle avec les 2 fonctions](#créer-un-modèle-avec-les-2-fonctions)
+  - [Ecrire les tests de ces 2 fonctions](#ecrire-les-tests-de-ces-2-fonctions)
+    - [Installer Jest](#installer-jest)
 
 # Exercice 1
 
@@ -471,4 +473,42 @@ A faire:
         process.exit()
     });
   ```
-
+## Ecrire les tests de ces 2 fonctions
+### Installer Jest
+* Installer la dépendance Jest
+    `npm install jest --save-dev`
+* Installer le fichier de définition de Jest :
+    `npm install @types/jest --save-dev`
+* Installer ts-jest (préprocesseur TypeSript pour Jest)
+    `npm install ts-jest --save-dev`
+* Initialiser ts-jest
+    `npx ts-jest config:init`
+    Cela crée le fichier de configuration `jest.config.js` dans le dossier courant :
+    ```javascript
+    module.exports = {
+        preset: 'ts-jest',
+        testEnvironment: 'node',
+    };
+    ```
+    >Pour plus d'info sur la configuration de jtest cf. https://jestjs.io/docs/configuration.
+* Ajouter un script au fichier `package.json`pour lancer un test jest en ligne de commande
+    ```javascript
+    ... 
+    "scripts": { 
+        ... 
+        "test": "jest" 
+     } , 
+    ...
+    ```
+* Créer le répertoire `__tests__`
+    >**Note** : Par défaut `jest` regarde les fichiers de tests inclus dans le répertoire nommé `__tests__`.
+* Ajouter ce répertoire au fichier `tsconfig.json` :
+    ```json
+    "include": [
+        "src/**/*",
+        "__tests__/**/*"
+    ]
+    ```
+### Créer le test sur les issues
+* Créer le fichier `issues.test.ts` dans le répertoire `__tests__`.
+    >**Remarque :** Par convention

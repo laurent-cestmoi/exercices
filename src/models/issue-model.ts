@@ -8,8 +8,8 @@ interface Issue {
     url: number;
 };
 
-export async function findAll(): Promise<Issue>{
-    const issues = await  knex('issues').select();
+export async function findAll(): Promise<Array<Issue>>{
+    const issues = await  knex('issues').select(); // Resolves to any
     return issues;
 };
 
