@@ -10,11 +10,12 @@ const app = express();
 const port = process.env.PORT || 3000;
 //const db = knex();
 
-import {findAll, findById} from "./models/issue-model";
+import {findAll, findById, findIdUpdatedBefore} from "./models/issue-model";
 
 async function main(): Promise<any> {
   console.log(await findAll());
   console.log(await findById(1)); // retourne l'issue qui a son id = 1
+  console.log(await findIdUpdatedBefore(new Date('2021-01-01 11:14:47.814646+02')));
 }
 
 main().catch(err => {

@@ -1,4 +1,4 @@
-import { findAll, findById } from '../src/models/issue-model';
+import { findAll, findById, findIdUpdatedBefore } from '../src/models/issue-model';
 import knex from '../src/config/knex'
 
 // Avant de lancer les tests on effectue une série d'opérations
@@ -9,11 +9,21 @@ beforeAll(async () => {
     await knex("issues").insert([
         {
             "nom": "Exercice 1",
-            "url": "https://github.com/laurent-cestmoi/montee-en-competences/issues/2"
+            "url": "https://github.com/laurent-cestmoi/montee-en-competences/issues/2",
+            "created_at": "2020-12-25 13:00:00",
+            "updated_at": "2020-12-25 13:10:00"
         },
         {
             "nom": "Exercice 2",
-            "url": "https://github.com/laurent-cestmoi/montee-en-competences/issues/4"
+            "url": "https://github.com/laurent-cestmoi/montee-en-competences/issues/4",
+            "created_at": "2021-01-10 10:00:00",
+            "updated_at": "2021-01-12 13:20:00"
+        },
+        {
+            "nom": "Exercice 3",
+            "url": "https://github.com/laurent-cestmoi/montee-en-competences/issues/5",
+            "created_at": "2021-04-25 10:00:00",
+            "updated_at": "2021-04-25 13:30:00"
         }
     ]);
 });
@@ -28,18 +38,20 @@ test('renvoie toutes les issues', async() => {
     // On exécute la fonction
     const data  = await findAll() ;
     // On indique le résultat attendu
-    expect(data.length).toEqual(2);
+    expect(data.length).toEqual(3); //La fonction renvoie un tableau d'issues
 });
 
 // On écrit le test sur la fonction devant renvoyer l'issues correspondant à l'id demandé
 test('renvoie l\'issue avec l\'id demandé', async() => {
-    // On exécute la fonction
     const data  = await findById(1) ;
-    console.log(data);
-    // On indique le résultat attendu
-    expect(data[0].id).toEqual(1);
-    // const value = 1 + 1;
-    // expect(value).toEqual(2);
+    expect(data[0].id).toEqual(1); // La fonction renvoie un tableau d'issues avec une seule issue dont on récupère l'id
+});
+
+// On écrit le test sur la fonction devant renvoyer les issues modifiées depuis une certaine date
+test('renvoie les issues mises à jour depuis une certaine date', async() => {
+    const madate: Date = new Date('2020-12-25 13:30:00');
+    const data  = await findIdUpdatedBefore(madate) ;
+    expect(data.length).toEqual(2); //La fonction renvoie un tableau d'issues
 });
 
 

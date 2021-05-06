@@ -14,6 +14,10 @@ Exercices pour montée en compétence sur Node.js, TypeScript, Knex.js, etc.
   - [Créer un modèle avec les 2 fonctions](#créer-un-modèle-avec-les-2-fonctions)
   - [Ecrire les tests de ces 2 fonctions](#ecrire-les-tests-de-ces-2-fonctions)
     - [Installer Jest](#installer-jest)
+    - [Créer le test sur les issues](#créer-le-test-sur-les-issues)
+    - [Exécuter les tests](#exécuter-les-tests)
+    - [Ajout de deux champs à la table issues](#ajout-de-deux-champs-à-la-table-issues)
+    - [Ajouter une méthode pour sélectionner des issues en fonction de leur date de mise à jour](#ajouter-une-méthode-pour-sélectionner-des-issues-en-fonction-de-leur-date-de-mise-à-jour)
 
 # Exercice 1
 
@@ -496,10 +500,14 @@ A faire:
     ... 
     "scripts": { 
         ... 
-        "test": "jest" 
+        "test": "jest --coverage",
+        "test:watch": "jest --watch",
      } , 
     ...
     ```
+    En fait on ajoute deux scripts :
+    * un avec l'option `--coverage` qui va ajouter les informations de couverture de code au rapport de résultats.
+    * un avec l'option `watch` qui n'exécute les tests que pour les fichiers `*.test.ts` modifiés depuis la dernière exécution.
 * Créer le répertoire `__tests__`
     >**Note** : Par défaut `jest` regarde les fichiers de tests inclus dans le répertoire nommé `__tests__`.
 * Ajouter ce répertoire au fichier `tsconfig.json` :
@@ -511,4 +519,152 @@ A faire:
     ```
 ### Créer le test sur les issues
 * Créer le fichier `issues.test.ts` dans le répertoire `__tests__`.
-    >**Remarque :** Par convention
+    >**Remarque :** Par convention on nomme les fichiers `*nom_de_la_classe_a_tester*.test.ts`.
+    ```javascript
+    import { findAll, findById, findIdUpdatedBefore } from '../src/models/issue-model';
+    import knex from '../src/config/knex'
+
+    // Avant de lancer les tests on effectue une série d'opérations
+    beforeAll(async () => {
+        // On vide la table issues
+        await knex("issues").truncate();
+        // On alimente ta table avec des données
+        await knex("issues").insert([
+            {
+                "nom": "Exercice 1",
+                "url": "https://github.com/laurent-cestmoi/montee-en-competences/issues/2"
+            },
+            {
+                "nom": "Exercice 2",
+                "url": "https://github.com/laurent-cestmoi/montee-en-competences/issues/4"
+            },
+            {
+                "nom": "Exercice 3",
+                "url": "https://github.com/laurent-cestmoi/montee-en-competences/issues/5"
+            }
+        ]);
+    });
+
+    // Fermer la connexion à la base (notamment pour bien sortir des tests)
+    afterAll(() => {
+        knex.destroy()
+    });
+
+    // On écrit le test sur la fonction devant renvoyer toutes les issues
+    test('renvoie toutes les issues', async() => {
+        // On exécute la fonction
+        const data  = await findAll() ;
+        // On indique le résultat attendu
+        expect(data.length).toEqual(3);
+    });
+
+    // On écrit le test sur la fonction devant renvoyer l'issues correspondant à l'id demandé
+    test('renvoie l\'issue avec l\'id demandé', async() => {
+        const data  = await findById(1) ;
+        expect(data[0].id).toEqual(1); // La fonction renvoie un tableau d'issues avec une seule issue dont on récupère l'id
+    });
+    ```
+
+### Exécuter les tests
+
+* Taper la commande :
+    `npm run test`
+* Vous obtenez quelque chose du genre :
+    ```
+    > exercices@1.0.0 test C:\_depots\exercices
+    > jest --coverage
+
+    PASS  __tests__/issues.test.ts
+    √ renvoie toutes les issues (4 ms)
+    √ renvoie l'issue avec l'id demandé (2 ms)
+
+    -----------------|---------|----------|---------|---------|-------------------
+    File             | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+    -----------------|---------|----------|---------|---------|-------------------
+    All files        |   86.67 |      100 |   66.67 |   86.67 | 
+    config           |     100 |      100 |     100 |     100 | 
+    knex.ts          |     100 |      100 |     100 |     100 | 
+    models           |      80 |      100 |   66.67 |      80 | 
+    issue-model.ts   |      80 |      100 |   66.67 |      80 | 26-27
+    -----------------|---------|----------|---------|---------|-------------------
+    Test Suites: 1 passed, 1 total
+    Tests:       2 passed, 2 total
+    Snapshots:   0 total
+    Time:        3.038 s
+    Ran all test suites.
+    ```
+### Ajout de deux champs à la table issues
+
+* Générer le fichier .js qui contiendra l'ajout des 2 attributs à notre table `issues` :
+    `npx knex --knexfile .\knex\cli-config.js migrate:make add2ColumnsTo_issues`
+    La commande affiche quelque chose du genre :
+    ```
+    Working directory changed to C:\_depots\exercices\knex
+    Created Migration:
+    C:\_depots\exercices\knex\migrations\20210506082443_add2ColumnsTo_issues.js
+    ```
+* Ouvrir le fichier créé `migrations\*datetime*_add2ColumnsTo_issues.js`
+* Modifier le fichier pour créer les deux colonnes a table `issues` :
+  * `updated_at`
+  * `created_at`
+
+    ```javascript
+    exports.up = knex =>
+    knex.schema.table('issues', t => {
+        t.timestamp('created_at').defaultTo(knex.fn.now());
+        t.timestamp('updated_at').defaultTo(knex.fn.now());
+    });
+
+    exports.down = knex =>
+    knex.schema.table('issues', t => {
+        t.dropColumns('created_at', 'updated_at');
+    });
+    ```
+* Lancer l'ajout de ces 2 colonnes dans la table issues :
+    ```
+    npx knex migrate:latest --knexfile .\knex\cli-config.js
+    Working directory changed to C:\_depots\exercices\knex
+    Batch 2 run: 1 migrations
+    ```
+* lancer la commande de migration pour vérifier que tout est à jour :
+    `npm run db:migrate`
+
+
+### Ajouter une méthode pour sélectionner des issues en fonction de leur date de mise à jour
+* Modifier le fichier `issue-model.ts` pour ajouter la méthode `findIdUpdatedBefore` :
+    ```typescript
+    export async function findIdUpdatedBefore(updated_at: Date): Promise<Array<Issue>> {
+        const issue = await  knex('issues').select().where("updated_at", '>=', updated_at);
+        return issue;
+    };
+  ```
+* Modifier les tests pour tester cette nouvelle méthode
+    * Commencer par modifier l'alimentation de la table pour ajouter les attributs concernant les dates :
+        ```typescript
+            {
+            "nom": "Exercice 1",
+            "url": "https://github.com/laurent-cestmoi/montee-en-competences/issues/2",
+            "created_at": "2020-12-25 13:00:00",
+            "updated_at": "2020-12-25 13:10:00"
+        },
+        {
+            "nom": "Exercice 2",
+            "url": "https://github.com/laurent-cestmoi/montee-en-competences/issues/4",
+            "created_at": "2021-01-10 10:00:00",
+            "updated_at": "2021-01-12 13:20:00"
+        },
+        {
+            "nom": "Exercice 3",
+            "url": "https://github.com/laurent-cestmoi/montee-en-competences/issues/5",
+            "created_at": "2021-04-25 10:00:00",
+            "updated_at": "2021-04-25 13:30:00"
+        }
+        ```
+    * Ajouter le test pour cette nouvelle méthode
+        ```typescript
+        test('renvoie les issues mises à jour depuis une certaine date', async() => {
+            const madate: Date = new Date('2020-12-25 13:30:00');
+            const data  = await findIdUpdatedBefore(madate) ;
+        expect(data.length).toEqual(2); //La fonction renvoie un tableau d'issues
+        });
+        ```
