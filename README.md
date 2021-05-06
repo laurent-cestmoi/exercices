@@ -581,11 +581,11 @@ A faire:
     -----------------|---------|----------|---------|---------|-------------------
     File             | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
     -----------------|---------|----------|---------|---------|-------------------
-    All files        |   86.67 |      100 |   66.67 |   86.67 | 
+    All files        |     100 |      100 |     100 |     100 | 
     config           |     100 |      100 |     100 |     100 | 
     knex.ts          |     100 |      100 |     100 |     100 | 
-    models           |      80 |      100 |   66.67 |      80 | 
-    issue-model.ts   |      80 |      100 |   66.67 |      80 | 26-27
+    models           |     100 |      100 |     100 |     100 | 
+    issue-model.ts   |     100 |      100 |     100 |     100 | 
     -----------------|---------|----------|---------|---------|-------------------
     Test Suites: 1 passed, 1 total
     Tests:       2 passed, 2 total
@@ -668,3 +668,28 @@ A faire:
         expect(data.length).toEqual(2); //La fonction renvoie un tableau d'issues
         });
         ```
+### Lancer tous les tests
+
+Relancer tous les tests :
+`npm run test`
+```
+ PASS  __tests__/issues.test.ts
+  √ renvoie toutes les issues (5 ms)
+  √ renvoie l'issue avec l'id demandé (2 ms)
+  √ renvoie les issues mises à jour depuis une certaine date (2 ms)
+
+-----------------|---------|----------|---------|---------|-------------------
+File             | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-----------------|---------|----------|---------|---------|-------------------
+All files        |     100 |      100 |     100 |     100 | 
+ config          |     100 |      100 |     100 |     100 | 
+  knex.ts        |     100 |      100 |     100 |     100 | 
+ models          |     100 |      100 |     100 |     100 | 
+  issue-model.ts |     100 |      100 |     100 |     100 | 
+-----------------|---------|----------|---------|---------|-------------------
+Test Suites: 1 passed, 1 total
+Tests:       3 passed, 3 total
+Snapshots:   0 total
+Time:        1.617 s, estimated 2 s
+Ran all test suites.
+```
