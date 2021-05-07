@@ -44,7 +44,7 @@ test('renvoie toutes les issues', async() => {
 // On écrit le test sur la fonction devant renvoyer l'issues correspondant à l'id demandé
 test('renvoie l\'issue avec l\'id demandé', async() => {
     const data  = await findById(1) ;
-    expect(data[0].id).toEqual(1); // La fonction renvoie un tableau d'issues avec une seule issue dont on récupère l'id
+    expect(data.id).toEqual(1); // La fonction renvoie un tableau d'issues avec une seule issue dont on récupère l'id
 });
 
 // On écrit le test sur la fonction devant renvoyer les issues modifiées depuis une certaine date

@@ -13,13 +13,13 @@ interface Issue {
 };
 
 export async function findAll(): Promise<Array<Issue>>{ // Select renvoie toujours un tableau
-    const issues = await  knex('issues').select(); // Resolves to any
+    const issues = await  knex('issues').select();
     return issues;
 };
 
-export async function findById(id: number): Promise<Array<Issue>> {
+export async function findById(id: number): Promise<Issue> {
     const issue = await  knex('issues').select().where("id", id);
-    return issue;
+    return issue.shift(); //select renvoie toujours un tableau. Pour récupérer le premier élément du tableau, donc l'issue, on utilise la méthode shift().
 };
 
 export async function findIdUpdatedBefore(updated_at: Date): Promise<Array<Issue>> {

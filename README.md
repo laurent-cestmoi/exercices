@@ -18,6 +18,7 @@ Exercices pour montée en compétence sur Node.js, TypeScript, Knex.js, etc.
     - [Exécuter les tests](#exécuter-les-tests)
     - [Ajout de deux champs à la table issues](#ajout-de-deux-champs-à-la-table-issues)
     - [Ajouter une méthode pour sélectionner des issues en fonction de leur date de mise à jour](#ajouter-une-méthode-pour-sélectionner-des-issues-en-fonction-de-leur-date-de-mise-à-jour)
+- [Exercice](#exercice)
 
 # Exercice 1
 
@@ -441,14 +442,14 @@ A faire:
         url: number;
     };
 
-    export async function findAll(): Promise<Issue>{
-        const issues = await db('issues');
+    export async function findAll(): Promise<Array<Issue>>{ // Select renvoie toujours un tableau
+        const issues = await  knex('issues').select();
         return issues;
     };
 
-    export async function findById(id: number): Promise<Issue>{
-        const issue = await db('issues').where("id", id);
-        return issue;
+    export async function findById(id: number): Promise<Issue> {
+        const issue = await  knex('issues').select().where("id", id);
+        return issue.shift(); //select renvoie toujours un tableau. Pour récupérer le premier élément du tableau, donc l'issue, on utilise la méthode shift().
     };
 
   ```
@@ -561,7 +562,7 @@ A faire:
     // On écrit le test sur la fonction devant renvoyer l'issues correspondant à l'id demandé
     test('renvoie l\'issue avec l\'id demandé', async() => {
         const data  = await findById(1) ;
-        expect(data[0].id).toEqual(1); // La fonction renvoie un tableau d'issues avec une seule issue dont on récupère l'id
+        expect(data.id).toEqual(1); // La fonction renvoie un tableau d'issues avec une seule issue dont on récupère l'id
     });
     ```
 
@@ -693,3 +694,7 @@ Snapshots:   0 total
 Time:        1.617 s, estimated 2 s
 Ran all test suites.
 ```
+>**Remarque :**
+L'option `coverage` fournit également un rapport au format `html`. Il est accessible dans le répertoire `coverage/lcov-report/index.html`.7
+
+# Exercice
