@@ -71,6 +71,7 @@
   "include": [
     "src/**/*",
     "__tests__/**/*"
+    //,"./knexfile.ts" // Je l'ai déplacé dans src
   ]
 }
 

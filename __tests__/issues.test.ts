@@ -1,11 +1,27 @@
-import { findAll, findById, findIdUpdatedBefore } from '../src/models/issue-model';
-import knex from '../src/config/knex'
+import { findAll, findById, findIdUpdatedBefore } from '../src/api/issues';
+
+// Import et initialisation de Knex.js
+import Knex from "knex"
+import knexFile from "../src/config/knexfile"
+const knex = Knex(knexFile.test)
+
+// Import de la calsse Model de Objection.js
+import { Model } from "objection";
+
+// On lie les modèles Objection à l'instance Knex
+Model.knex(knex)
+
+//import { dbManager } from '../src/config/knex-db-manager'
 
 // Avant de lancer les tests on effectue une série d'opérations
 beforeAll(async () => {
     // On vide la table issues
-    await knex("issues").truncate();
+    //await knex("issues").truncate()
+    //console.info('Suppression du contenu de la table issues')
+    await knex("issues").truncate()
     // On alimente ta table avec des données
+    //await knex("issues").insert([
+    //console.info('Alimentation de la table issues')
     await knex("issues").insert([
         {
             "nom": "Exercice 1",
@@ -30,6 +46,7 @@ beforeAll(async () => {
 
 // Fermer la connexion à la base (notamment pour bien sortir des tests)
 afterAll(() => {
+    //knex.destroy()
     knex.destroy()
 });
 

@@ -18,7 +18,8 @@ Exercices pour montée en compétence sur Node.js, TypeScript, Knex.js, etc.
     - [Exécuter les tests](#exécuter-les-tests)
     - [Ajout de deux champs à la table issues](#ajout-de-deux-champs-à-la-table-issues)
     - [Ajouter une méthode pour sélectionner des issues en fonction de leur date de mise à jour](#ajouter-une-méthode-pour-sélectionner-des-issues-en-fonction-de-leur-date-de-mise-à-jour)
-- [Exercice](#exercice)
+- [Exercice 3](#exercice-3)
+  - [Création, alimentation, suppression d'une base de données pour les tests](#création-alimentation-suppression-dune-base-de-données-pour-les-tests)
 
 # Exercice 1
 
@@ -695,6 +696,138 @@ Time:        1.617 s, estimated 2 s
 Ran all test suites.
 ```
 >**Remarque :**
-L'option `coverage` fournit également un rapport au format `html`. Il est accessible dans le répertoire `coverage/lcov-report/index.html`.7
+L'option `coverage` fournit également un rapport au format `html`. Il est accessible dans le répertoire `coverage/lcov-report/index.html`.
 
-# Exercice
+# Exercice 3
+
+On va basculer notre configuration Knex en fichier TypeScript pour essayer de faire un maximum de code en TypeScript ;-)
+* Taper la commande d'initialisation de Knex avec création d'un fichier TypeScript
+    `knex init -x ts`
+    Cela affiche :
+    ```
+    npx knex init -x ts
+    Created ./knexfile.ts
+    ```
+* On va paraméter la configuration pour l'adapter à différents environnement (développement, tests, prod par exemple).
+    * Creer le fichier `config.ts è dans le répertoire `config`:
+    * Y écrire le code suivant :
+        ```typescript
+        import * as dotenv from 'dotenv'
+        import path from 'path'
+
+        const envPath = path.join(
+        __dirname,
+        // J'utilise un seul fichier .env pour l'instant
+        // `../../.env.${process.env.NODE_ENV || 'development'}`
+        `../../.env`
+        )
+        dotenv.config({ path: envPath })
+        export const PORT = process.env.PGPORT
+        export const DB_HOST = process.env.PGHOST
+        export const DB_NAME = process.env.PGDATABASE
+        export const DB_USER = process.env.PGUSER
+        export const DB_PASSWORD = process.env.PGPASSWORD
+        ```
+    * On va ajouter `Objection.js` qui est un ORM pour gérer nos objets métiers et faire le mapping avec notre base de données. `Objection.js` utilise `Knex.js` pour créer les requêtes qu'il envoie en base. `Objection.js` ajoute une couche "Model" avec de la validation et une gestion poussée des relations. Il gère également les transactions, en liant un ou plusieurs modèles à une transaction.
+        * Installer objection :
+            `npm install objection`
+    * Ouvrir le fichier de configuration de Knex.js `knexfile.ts` et y écrire le code suivant :
+        ```typescript
+        import { DB_HOST, DB_NAME, DB_PASSWORD, DB_USER } from './src/config/config'
+        // On ajoute la conversion automatique entre la façon de nommer snakeCase en base de données
+        // et camelCase dans le code
+        import { knexSnakeCaseMappers } from 'objection'
+        module.exports = {
+            development: {
+                client: 'pg',
+                connection: {
+                host: DB_HOST,
+                database: DB_NAME,
+                user: DB_USER,
+                password: DB_PASSWORD,
+                },
+                pool: {
+                min: 2,
+                max: 10,
+                },
+                migrations: {
+                directory: './knex/migrations',
+                },
+                seeds: {
+                directory: './knex/seeds',
+                },
+                ...knexSnakeCaseMappers()
+            },
+            test: {
+                client: 'pg',
+                connection: {
+                host: DB_HOST,
+                database: DB_NAME+'_tests',
+                user: DB_USER,
+                password: DB_PASSWORD,
+                },
+                pool: {
+                min: 2,
+                max: 10,
+                },
+                migrations: {
+                directory: './knex/migrations',
+                },
+                seeds: {
+                directory: './knex/seeds',
+                },
+                ...knexSnakeCaseMappers()
+            },
+            production: {
+                client: 'pg',
+                connection: {
+                host: DB_HOST,
+                database: DB_NAME,
+                user: DB_USER,
+                password: DB_PASSWORD,
+                },
+                pool: {
+                min: 2,
+                max: 10,
+                },
+                migrations: {
+                directory: './knex/migrations',
+                },
+                seeds: {
+                directory: './knex/seeds',
+                },
+                ...knexSnakeCaseMappers()
+            },
+        }
+        ```
+        >**Remarque :**
+        La fonction `knexSnakeCaseMappers` d'Objection.js permet de convertir la notation snake_case à camelCase pour Knex. Les objets Objection.js sont en notation camelCase (exzemple : maTable) alors que Knex solicite exactement les noms en base de données qui sont en snake_case (exemple : ma_table).
+    * modifier l'initialisation de Knex.js dans le fichier `server.ts`:
+        ```typescript
+        import Knex from "knex"
+        import knexFile from "../knexfile"
+        const knex = Knex(knexFile.development)
+        ```
+    * importer les modèles d'Objections.js et les brancher sur l'instance Knex.js :
+        ```typescript
+        // Import de la calsse Model de Objection.js
+        import { Model } from "objection";
+        // On lie les modèles Objection à l'instance Knex
+        Model.knex(knex)
+        ```   
+## Création, alimentation, suppression d'une base de données pour les tests
+
+knex.js n'a pas de fonction pour créer ou supprimer une base de données. Pour ces fonctions nécessitant un utilisateur avec des droits fort sur le cluster gérant les bases de données on va alors utiliser le paquet `knex-db-manager`.
+
+* installer `knex-db-manager` :
+    `npm install knex-db-manager --save-dev`
+* Installer le fichier de définition de Jest :
+    `npm install @types/knex-db-manager --save-dev`
+    >Remarque :
+    A priori la dépendance `pg-escape` est nécessaire car sinon l'erreur suivante est affichée :
+    `Error: Cannot find module 'pg-escape'`
+    Installer donc 'pg-escape' :
+    `npm install pg-escape --save-dev`
+    
+
+

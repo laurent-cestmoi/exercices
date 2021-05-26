@@ -1,7 +1,7 @@
 const { join } = require('path')
 require('dotenv').config({ path: join(__dirname, '..', '.env') })
 
-//const { knexSnakeCaseMappers } = require('objection')
+const { knexSnakeCaseMappers } = require('objection')
 
 const connection = {
   host: process.env.PGHOST,
@@ -19,8 +19,10 @@ const knexConfig = {
   },
   seeds: {
     directory: join(__dirname, './seeds')
-  }//,
- // ...knexSnakeCaseMappers()
+  },
+  // knexSnakeCaseMappers convertit les nom camelCase du code en snake_case en base de données
+  // (ex : titleIssue dans le code deviendra title_issue pour communiquer avec la bdd)
+ ...knexSnakeCaseMappers()          
 }
 
 module.exports = { knexConfig, connection };
